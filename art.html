@@ -8,23 +8,23 @@
             margin: 0;
             font-family: Arial, sans-serif;
             background: linear-gradient(#87CEFA, #E0F6FF); /* 天空漸層 */
-            overflow-x: hidden; /* 不讓雲飄出時出現捲軸 */
+            overflow-x: hidden;
             padding: 20px;
         }
 
-        /* --- 雲動畫背景 --- */
+        /* --- 動畫雲背景 --- */
         .clouds {
             position: fixed;
             top: 0;
             left: 0;
-            width: 200%;       /* 做大一點避免空白區 */
+            width: 200%;
             height: 100%;
-            background: url('https://i.imgur.com/wl5N5Zb.png'); /* 雲朵圖片 */
+            background: url('https://i.imgur.com/wl5N5Zb.png');
             background-size: cover;
-            opacity: 0.6;      /* 雲透明度 */
+            opacity: 0.6;
             animation: moveClouds 60s linear infinite;
-            pointer-events: none; /* 不阻擋滑鼠操作 */
-            z-index: -1;       /* 在所有內容後面 */
+            pointer-events: none;
+            z-index: -1;
         }
 
         @keyframes moveClouds {
@@ -32,12 +32,11 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* --- 原本的網頁樣式 --- */
-
+        /* --- 主要內容框架 --- */
         .container {
             width: 70%;
             margin: auto;
-            background: rgba(255, 255, 255, 0.9); /* 加透明背景讓雲稍微透過 */
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px #ccc;
@@ -116,12 +115,11 @@
             border-radius: 8px;
             cursor: pointer;
         }
-
     </style>
 </head>
 <body>
 
-<!-- 雲背景（一定要放在 body 最上面） -->
+<!-- 🌥️ 放在最上面：雲朵背景 -->
 <div class="clouds"></div>
 
 <div class="container">
@@ -135,7 +133,7 @@
         </button>
     </div>
 
-    <!-- 中間作品顯示 -->
+    <!-- 作品顯示 -->
     <img id="preview" class="art-display" src="" alt="尚未上傳作品">
 
     <!-- 創作理念 -->
@@ -188,7 +186,7 @@
         alert("作品已加入列表！");
     }
 
-    // 留言板功能
+    // 加留言
     function addComment() {
         const commentText = document.getElementById("commentInput").value;
         if (commentText.trim() === "") {
