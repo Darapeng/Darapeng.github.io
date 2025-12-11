@@ -3,7 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>作品分享互動區</title>
-    <style>
+    <style>/* 全頁天空背景 */
+body {<div class="clouds"></div>
+
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(#87CEFA, #E0F6FF); /* 漸層天空藍 */
+    overflow-x: hidden;
+}
+
+/* 雲朵圖層 */
+.clouds {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: url('https://i.imgur.com/wl5N5Zb.png'); /* 免下載雲圖 */
+    background-size: cover;
+    animation: moveClouds 60s linear infinite;
+    opacity: 0.6;
+}
+
+/* 雲朵左右飄動動畫 */
+@keyframes moveClouds {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
