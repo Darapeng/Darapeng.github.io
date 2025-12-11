@@ -2,41 +2,19 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>作品分享互動區</title>
+    <title>作品分享互動網頁</title>
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(#87CEFA, #E0F6FF); /* 天空漸層 */
-            overflow-x: hidden;
+            background-color: #87CEFA; /* 天藍色背景 */
             padding: 20px;
         }
 
-        /* --- 動畫雲背景 --- */
-        .clouds {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 100%;
-            background: url('https://i.imgur.com/wl5N5Zb.png');
-            background-size: cover;
-            opacity: 0.6;
-            animation: moveClouds 60s linear infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        @keyframes moveClouds {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* --- 主要內容框架 --- */
         .container {
             width: 70%;
             margin: auto;
-            background: rgba(255, 255, 255, 0.9);
+            background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px #ccc;
@@ -119,10 +97,8 @@
 </head>
 <body>
 
-<!-- 🌥️ 放在最上面：雲朵背景 -->
-<div class="clouds"></div>
-
 <div class="container">
+
     <h1>作品分享互動網頁</h1>
 
     <!-- 上傳作品按鈕 -->
