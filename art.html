@@ -105,7 +105,7 @@ textarea { width:100%; padding:8px; }
 <script>
 let works = JSON.parse(localStorage.getItem("works")) || [];
 let currentIndex = null;
-let tempWork = null; // ⭐ 暫存作品
+let tempWork = null;
 
 const fileInput = document.getElementById("fileInput");
 const preview = document.getElementById("preview");
@@ -116,13 +116,13 @@ const workList = document.getElementById("workList");
 
 window.onload = () => renderList();
 
-// 開啟檔案選擇
+// 開啟上傳
 function openUploader() {
     fileInput.value = "";
     fileInput.click();
 }
 
-// 選擇圖片（只暫存）
+// 上傳圖片 → 一定建立 tempWork
 fileInput.addEventListener("change", function () {
     const file = this.files[0];
     if (!file) return;
@@ -134,19 +134,22 @@ fileInput.addEventListener("change", function () {
             idea: "",
             comments: []
         };
+
         preview.src = tempWork.image;
         ideaInput.value = "";
+        commentInput.value = "";
         commentList.innerHTML = "";
+
         currentIndex = null;
         renderList();
     };
     reader.readAsDataURL(file);
 });
 
-// 儲存新作品
+// 儲存新作品（只看 tempWork）
 function saveNewWork() {
     if (!tempWork) {
-        alert("請先上傳作品");
+        alert("目前沒有可儲存的作品");
         return;
     }
 
@@ -156,14 +159,13 @@ function saveNewWork() {
 
     tempWork = null;
 
-    // 清空顯示區
     preview.src = "";
     ideaInput.value = "";
     commentInput.value = "";
     commentList.innerHTML = "";
 
     renderList();
-    alert("作品已加入列表");
+    alert("作品已成功儲存");
 }
 
 // 顯示作品列表
@@ -178,22 +180,24 @@ function renderList() {
     });
 }
 
-// 選取作品
+// 選取已儲存作品 → 結束暫存狀態
 function selectWork(index) {
-    currentIndex = index;
     tempWork = null;
+    currentIndex = index;
+
     preview.src = works[index].image;
     ideaInput.value = works[index].idea;
     showComments();
     renderList();
 }
 
-// 留言（僅限已儲存作品）
+// 留言（只限已儲存作品）
 function addComment() {
     if (currentIndex === null) {
-        alert("請先從作品列表選擇作品");
+        alert("請先選擇已儲存的作品");
         return;
     }
+
     const text = commentInput.value.trim();
     if (!text) return;
 
