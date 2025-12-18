@@ -11,6 +11,7 @@ body {
     background-color: #CFEFFF;
     padding: 20px;
 }
+
 .container {
     width: 75%;
     margin: auto;
@@ -18,50 +19,72 @@ body {
     padding: 20px;
     border-radius: 10px;
 }
+
+h1, h2 {
+    text-align: center;
+}
+
 .top-bar {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
+
 button {
     padding: 6px 12px;
     border-radius: 6px;
     border: none;
     cursor: pointer;
 }
-.upload { background:#4CAF50;color:white; }
-.delete { background:#f44336;color:white; }
+
+.upload-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
 
 .preview {
     width: 100%;
     height: 300px;
     border: 2px dashed #aaa;
-    margin: 10px 0;
+    border-radius: 10px;
     object-fit: contain;
+    margin: 10px 0;
 }
 
-.list {
+.work-list {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
 }
-.list img {
+
+.work-list img {
     width: 80px;
     height: 80px;
     object-fit: cover;
     cursor: pointer;
-    border: 2px solid #ccc;
     border-radius: 6px;
+    border: 2px solid #ccc;
 }
-.list img.active {
+
+.work-list img.active {
     border-color: #2196F3;
 }
 
+textarea {
+    width: 100%;
+    padding: 8px;
+}
+
 .comment {
-    background:#eee;
-    padding:6px;
-    margin-top:5px;
-    border-radius:5px;
+    background: #f1f1f1;
+    padding: 6px;
+    margin-top: 5px;
+    border-radius: 5px;
 }
 </style>
 </head>
@@ -72,112 +95,151 @@ button {
 <h1>作品分享互動網頁</h1>
 
 <div class="top-bar">
-    <button class="delete" onclick="deleteWork()">刪除作品</button>
-    <button class="upload" onclick="openUploader()">上傳作品</button>
+    <button class="delete-btn" onclick="deleteWork()">刪除作品</button>
+    <button class="upload-btn" onclick="openUploader()">上傳作品</button>
 </div>
 
 <input type="file" id="fileInput" accept="image/*" hidden>
 
 <img id="preview" class="preview">
 
-<h3>作品列表</h3>
-<div id="list" class="list"></div>
+<h2>作品列表</h2>
+<div id="workList" class="work-list"></div>
 
-<h3>創作理念</h3>
-<textarea id="idea" rows="3" style="width:100%"></textarea>
+<hr>
+
+<h2>創作理念</h2>
+<textarea id="ideaInput" rows="3" placeholder="請輸入創作理念..."></textarea>
 <button onclick="saveIdea()">儲存理念</button>
 
-<h3>留言區</h3>
-<textarea id="comment" rows="2" style="width:100%"></textarea>
+<h2>留言區</h2>
+<textarea id="commentInput" rows="2" placeholder="請輸入留言..."></textarea>
 <button onclick="addComment()">送出留言</button>
-<div id="comments"></div>
+<div id="commentList"></div>
 </div>
 
 <script>
 let works = JSON.parse(localStorage.getItem("works")) || [];
-let current = null;
-const fileInput = document.getElementById("fileInput");
+let currentIndex = null;
 
+const fileInput = document.getElementById("fileInput");
+const preview = document.getElementById("preview");
+const ideaInput = document.getElementById("ideaInput");
+const commentInput = document.getElementById("commentInput");
+const commentList = document.getElementById("commentList");
+const workList = document.getElementById("workList");
+
+window.onload = () => {
+    renderList();
+};
+
+// 開啟上傳
 function openUploader() {
-    fileInput.value = ""; // ⭐⭐⭐ 關鍵修正
+    fileInput.value = "";
     fileInput.click();
 }
 
+// 上傳圖片
 fileInput.addEventListener("change", function () {
     const file = this.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-        works.push({ image: reader.result, idea:"", comments:[] });
-        save();
+        works.push({
+            image: reader.result,
+            idea: "",
+            comments: []
+        });
+
+        saveData();
         renderList();
-        select(works.length - 1);
+
+        // ⭐ 上傳後清空顯示區
+        currentIndex = null;
+        preview.src = "";
+        ideaInput.value = "";
+        commentInput.value = "";
+        commentList.innerHTML = "";
     };
     reader.readAsDataURL(file);
 });
 
+// 顯示作品列表
 function renderList() {
-    list.innerHTML = "";
-    works.forEach((w,i)=>{
+    workList.innerHTML = "";
+    works.forEach((work, index) => {
         const img = document.createElement("img");
-        img.src = w.image;
-        img.onclick = ()=>select(i);
-        if(i===current) img.classList.add("active");
-        list.appendChild(img);
+        img.src = work.image;
+        img.onclick = () => selectWork(index);
+        if (index === currentIndex) img.classList.add("active");
+        workList.appendChild(img);
     });
 }
 
-function select(i){
-    current = i;
-    preview.src = works[i].image;
-    idea.value = works[i].idea;
+// 選取作品
+function selectWork(index) {
+    currentIndex = index;
+    preview.src = works[index].image;
+    ideaInput.value = works[index].idea;
     showComments();
     renderList();
 }
 
-function saveIdea(){
-    if(current===null) return;
-    works[current].idea = idea.value;
-    save();
+// 儲存理念
+function saveIdea() {
+    if (currentIndex === null) {
+        alert("請先從作品列表選擇作品");
+        return;
+    }
+    works[currentIndex].idea = ideaInput.value;
+    saveData();
+    alert("創作理念已儲存");
 }
 
-function addComment(){
-    if(current===null) return;
-    const t = comment.value.trim();
-    if(!t) return;
-    works[current].comments.push(t);
-    comment.value="";
-    save();
+// 新增留言
+function addComment() {
+    if (currentIndex === null) {
+        alert("請先選擇作品");
+        return;
+    }
+    const text = commentInput.value.trim();
+    if (!text) return;
+
+    works[currentIndex].comments.push(text);
+    commentInput.value = "";
+    saveData();
     showComments();
 }
 
-function showComments(){
-    comments.innerHTML="";
-    works[current].comments.forEach(c=>{
-        const d=document.createElement("div");
-        d.className="comment";
-        d.textContent=c;
-        comments.appendChild(d);
+// 顯示留言
+function showComments() {
+    commentList.innerHTML = "";
+    works[currentIndex].comments.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "comment";
+        div.textContent = c;
+        commentList.appendChild(div);
     });
 }
 
-function deleteWork(){
-    if(current===null) return;
-    if(!confirm("確定刪除？")) return;
-    works.splice(current,1);
-    save();
+// 刪除作品
+function deleteWork() {
+    if (currentIndex === null) {
+        alert("目前沒有選取任何作品");
+        return;
+    }
+    if (!confirm("確定要刪除這件作品嗎？")) return;
+
+    works.splice(currentIndex, 1);
+    saveData();
     location.reload();
 }
 
-function save(){
-    localStorage.setItem("works",JSON.stringify(works));
+// 儲存資料
+function saveData() {
+    localStorage.setItem("works", JSON.stringify(works));
 }
-
-window.onload=()=>{
-    renderList();
-    if(works.length>0) select(0);
-};
 </script>
 
 </body>
