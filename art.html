@@ -36,14 +36,23 @@ h1, h2 { text-align: center; }
     margin-bottom: 10px;
 }
 
+.work-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
 .work-list img {
-    width: 120px;
-    height: 120px;
+    width: 80px;      /* ✅ 縮圖變小 */
+    height: 80px;
     object-fit: cover;
-    margin: 5px;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 2px solid #ccc;
+}
+
+.section {
+    margin-top: 15px;
 }
 
 .comment {
@@ -52,6 +61,7 @@ h1, h2 { text-align: center; }
     margin-top: 5px;
     border-radius: 5px;
 }
+
 textarea { width: 100%; padding: 8px; }
 button { padding: 6px 12px; cursor: pointer; }
 
@@ -82,15 +92,25 @@ button { padding: 6px 12px; cursor: pointer; }
 
 <img id="preview" class="art-display">
 
-<h2>作品列表（點擊選取）</h2>
-<div id="workList"></div>
+<div class="section">
+    <h2>作品列表（縮圖）</h2>
+    <div id="workList" class="work-list"></div>
+</div>
 
 <hr>
 
-<h2>留言區</h2>
-<textarea id="commentInput" rows="3" placeholder="輸入留言..."></textarea>
-<button onclick="addComment()">送出留言</button>
-<div id="commentList"></div>
+<div class="section">
+    <h2>創作理念</h2>
+    <textarea id="ideaInput" rows="3" placeholder="輸入創作理念..."></textarea>
+    <button onclick="saveIdea()">儲存理念</button>
+</div>
+
+<div class="section">
+    <h2>留言區</h2>
+    <textarea id="commentInput" rows="2" placeholder="輸入留言..."></textarea>
+    <button onclick="addComment()">送出留言</button>
+    <div id="commentList"></div>
+</div>
 
 </div>
 
@@ -110,37 +130,49 @@ fileInput.addEventListener("change", function(e){
 
     const reader = new FileReader();
     reader.onload = function(){
-        works.push({ image: reader.result, comments: [] });
+        works.push({
+            image: reader.result,
+            idea: "",
+            comments: []
+        });
         saveWorks();
         addImageToList(works.length - 1);
     };
     reader.readAsDataURL(file);
 });
 
-// 顯示作品縮圖
+// 顯示縮圖
 function addImageToList(index){
     const img = document.createElement("img");
     img.src = works[index].image;
     img.onclick = function(){ selectWork(index); };
-    document.getElementById("workList").appendChild(img);
+    workList.appendChild(img);
 }
 
 // 選取作品
 function selectWork(index){
     currentIndex = index;
     preview.src = works[index].image;
+    ideaInput.value = works[index].idea;
     showComments();
+}
+
+// 儲存理念
+function saveIdea(){
+    if (currentIndex === null) return;
+    works[currentIndex].idea = ideaInput.value;
+    saveWorks();
+    alert("創作理念已儲存");
 }
 
 // 顯示留言
 function showComments(){
-    const list = document.getElementById("commentList");
-    list.innerHTML = "";
+    commentList.innerHTML = "";
     works[currentIndex].comments.forEach(c => {
         const div = document.createElement("div");
         div.className = "comment";
         div.textContent = c;
-        list.appendChild(div);
+        commentList.appendChild(div);
     });
 }
 
@@ -161,18 +193,14 @@ function addComment(){
 
 // 刪除作品
 function deleteWork(){
-    if (currentIndex === null) {
-        alert("請先選擇作品！");
-        return;
-    }
-    if (!confirm("確定要刪除這件作品？")) return;
+    if (currentIndex === null) return;
+    if (!confirm("確定刪除這件作品？")) return;
 
     works.splice(currentIndex, 1);
     saveWorks();
     location.reload();
 }
 
-// 儲存
 function saveWorks(){
     localStorage.setItem("works", JSON.stringify(works));
 }
