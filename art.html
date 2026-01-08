@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <title>作品分享互動網頁</title>
-
-    <!-- 網站小圖 -->
-    <link rel="icon" type="image/png" href="haha.png">
-</head>
-
-
+<meta charset="UTF-8">
+<title>作品分享互動網頁</title>
+<link rel="icon" type="image/png" href="haha.png">
 
 <style>
 body {
     font-family: Arial, sans-serif;
-    background-color: #CFEFFF;
+    background-color: #E6F6FF;
     padding: 20px;
 }
 .container {
@@ -45,6 +40,7 @@ button {
     border-radius: 10px;
     object-fit: contain;
     margin: 10px 0;
+    cursor: zoom-in;
 }
 
 .list {
@@ -64,13 +60,41 @@ button {
     border-color: #2196F3;
 }
 
-textarea { width:100%; padding:8px; }
+textarea {
+    width:100%;
+    padding:8px;
+    box-sizing: border-box;
+}
 
 .comment {
     background:#eee;
     padding:6px;
     margin-top:5px;
     border-radius:5px;
+}
+
+/* ===== 放大檢視（Lightbox）===== */
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+#overlay img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
+}
+#close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
 }
 </style>
 </head>
@@ -88,7 +112,7 @@ textarea { width:100%; padding:8px; }
 
 <input type="file" id="fileInput" accept="image/*" hidden>
 
-<img id="preview" class="preview">
+<img id="preview" class="preview" onclick="openZoom()">
 
 <h3>作品列表</h3>
 <div id="list" class="list"></div>
@@ -102,6 +126,12 @@ textarea { width:100%; padding:8px; }
 <div id="comments"></div>
 </div>
 
+<!-- 放大檢視 -->
+<div id="overlay" onclick="closeZoom()">
+    <span id="close">✕</span>
+    <img id="zoomImg">
+</div>
+
 <script>
 let works = JSON.parse(localStorage.getItem("works")) || [];
 let current = null;
@@ -112,6 +142,9 @@ const idea = document.getElementById("idea");
 const comment = document.getElementById("comment");
 const comments = document.getElementById("comments");
 const list = document.getElementById("list");
+
+const overlay = document.getElementById("overlay");
+const zoomImg = document.getElementById("zoomImg");
 
 window.onload = renderList;
 
@@ -136,7 +169,6 @@ fileInput.addEventListener("change", function () {
     reader.readAsDataURL(file);
 });
 
-// ⭐⭐⭐ 關鍵：只要畫面有圖，就能存
 function saveWork() {
     if (!preview.src) {
         alert("目前沒有作品可以儲存");
@@ -210,6 +242,17 @@ function deleteWork() {
     works.splice(current, 1);
     localStorage.setItem("works", JSON.stringify(works));
     location.reload();
+}
+
+/* ===== 放大檢視功能 ===== */
+function openZoom() {
+    if (!preview.src) return;
+    zoomImg.src = preview.src;
+    overlay.style.display = "flex";
+}
+
+function closeZoom() {
+    overlay.style.display = "none";
 }
 </script>
 
